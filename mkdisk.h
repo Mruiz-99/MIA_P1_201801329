@@ -1,4 +1,3 @@
-
 #include <vector>
 #include <iostream>
 #include <string.h>
@@ -17,17 +16,21 @@ void crearDisco(disk disco, int id){
         }else{
             cout<<"La unidad "<<disco.multiplicador<<" no es reconocible"<<endl;
         }
+        //crea la variable nulo que son 1024 ceros
         char nulo[1024];
         for(int i=0;i<1024;i++){
             nulo[i]='\0';
         }
+        //Ingresa los ceros al archivo (dico)
         for(int i=0;i<(multiplicador*disco.size);i++){
             fwrite(&nulo,sizeof(nulo),1,archivo);
         }
+        //se posiciona al principio de archivo 
         fseek(archivo,0,SEEK_SET);
         int tamano = disco.size*multiplicador*1024;
         partition def;
         def.part_status='n';
+        //Escribe el struct del MBR en el archivo 
         mbr MBR={tamano,time(0),id,disco.ajuste,def,def,def,def};
         fwrite(&MBR,sizeof(mbr),1,archivo);
         fclose(archivo);
@@ -38,7 +41,7 @@ void crearDisco(disk disco, int id){
 }
 void mkdisk(vector<string>Argumentos, int id){
     disk disco = {0,'f',"m",""};
-    bool trouble=false;
+    bool problem=false;
     for(int i=0;i<Argumentos.size();i++){
         vector<string> componentes = split(Argumentos[i],"=");
         if(lower(componentes[0])=="mkdisk"){
@@ -48,7 +51,7 @@ void mkdisk(vector<string>Argumentos, int id){
                 disco.size=atoi(componentes[1].c_str());
             }else{
                 cout<<"Tamaño del disco no valido"<<endl;
-                trouble=true;
+                problem=true;
             }
             disco.size=atoi(componentes[1].c_str());
         }else if(lower(componentes[0])=="-f"){
@@ -58,28 +61,28 @@ void mkdisk(vector<string>Argumentos, int id){
                 disco.ajuste=tmp[0];
             }else{
                 cout<<"Ajuste ingresado no valido"<<endl;
-                trouble=true;
+                problem=true;
             }
         }else if(lower(componentes[0])=="-u"){
             if((lower(componentes[1])=="m")||(lower(componentes[1])=="k")){
                 disco.multiplicador=lower(componentes[1]);
             }else{
                 cout<<"Unidades ingresadas no validas"<<endl;
-                trouble=true;
+                problem=true;
             }
         }else if(lower(componentes[0])=="-path"){
             if((split(componentes[1],".")[1]=="dk")||(split(componentes[1],".")[1]=="dk\"")){
                 disco.direccion=quitarComillas(componentes[1]);
             }else{
                 cout<<"Extesion del disco no valida"<<endl;
-                trouble=true;
+                problem=true;
             }
         }else{
             cout<<"Comando mkdisk no valido"<<endl;
-                trouble=true;
+                problem=true;
         }
     }
-    if(trouble==true){
+    if(problem==true){
     }else if((disco.size==0)||(disco.direccion=="")){
         cout<<"Parametros obligatorios incompletos"<<endl;
     }else{

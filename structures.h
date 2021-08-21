@@ -22,6 +22,27 @@ struct mbr{
     partition mbr_partition_3;
     partition mbr_partition_4;
 };
+struct part{
+    int size;
+    string unidades;
+    string direccionDisco;
+    char tipo;
+    char ajuste;
+    int delAdd;
+    string del;
+    string nombre;
+    int add;
+};
+
+struct ebr{
+    char part_status;
+    char part_fit;
+    int part_start;
+    int part_size;
+    int part_next;
+    char part_name[16];
+};
+ 
 
 #include <iostream>
 #include <vector>

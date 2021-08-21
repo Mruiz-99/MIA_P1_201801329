@@ -15,6 +15,7 @@ using namespace std;
 #include "exec.h"
 #include "mkdisk.h"
 #include "rmdisk.h"
+#include "fdisk.h"
 
 int discos=1;
 
@@ -26,6 +27,8 @@ void ejecutar (string cmd){
             discos++;
         }else if(lower(partes[0])=="rmdisk"){
             rmdisk(partes);
+        }else if(lower(partes[0])=="fdisk"){
+            fdisk(partes);
         }
     }    
 }
@@ -44,3 +47,9 @@ int main(){
         }
     }
 }
+/*
+MKdisk -size=3000 -u=k -path=/home/user/Disco1.dk
+fdisk -type=e -path=/home/user/Disco1.dk -u=k -size=300 -name=Particion1
+fdisk -size=1 -type=l  -u=k -f=ff -path=/home/user/Disco1.dk -name=Particion2
+fdisk -size=1 -type=p -u=k -f=ff -path=/home/user/Disco1.dk -name=Particion2
+*/
