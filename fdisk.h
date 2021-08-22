@@ -602,7 +602,7 @@ void crearParticion(part entrada)
                         {
                             fseek(disco, (aux.part_start + sizeof(partition) + 1), SEEK_SET);
                             ebr inicio;
-                            inicio = {'n', '0', aux.part_start + sizeof(partition) + 1, 0, 0, 'a'};
+                            inicio = {'n', '0', int(aux.part_start + sizeof(partition) + 1), 0, 0, 'a'};
                             fwrite(&inicio, sizeof(inicio), 1, disco);
                         }
                         cout << "Particion '" << entrada.nombre << "' creada correctamente" << endl;
@@ -665,7 +665,7 @@ bool eliminarLogica(string nombre, int part_start, FILE *disco, part entrada, st
             if (tipo == "fast")
             {
 
-                ebr = {'n', NULL, ebr.part_start, 0, ebr.part_next, 'a'};
+                ebr = {'n', '0', ebr.part_start, 0, ebr.part_next, 'a'};
                 fseek(disco, part_start, SEEK_SET);
                 fwrite(&ebr, sizeof(ebr), 1, disco);
             }
@@ -677,7 +677,7 @@ bool eliminarLogica(string nombre, int part_start, FILE *disco, part entrada, st
                     fseek(disco, part_start + i, SEEK_SET);
                     fwrite(&nulo, sizeof(nulo), 1, disco);
                 }
-                ebr = {'n', NULL, ebr.part_start, 0, ebr.part_next, 'a'};
+                ebr = {'n', '0', ebr.part_start, 0, ebr.part_next, 'a'};
                 fseek(disco, part_start, SEEK_SET);
                 fwrite(&ebr, sizeof(ebr), 1, disco);
             }
@@ -720,7 +720,7 @@ void eliminarParticion(part entrada)
         {
             partition nuevo;
             nuevo.part_status = 'n';
-            nuevo.part_type = NULL;
+            nuevo.part_type = '0';
             master.mbr_partition_1 = nuevo;
             fseek(disco, 0, SEEK_SET);
             fwrite(&master, sizeof(master), 1, disco);
@@ -736,7 +736,7 @@ void eliminarParticion(part entrada)
             }
             partition nuevo;
             nuevo.part_status = 'n';
-            nuevo.part_type = NULL;
+            nuevo.part_type = '0';
             master.mbr_partition_1 = nuevo;
             fseek(disco, 0, SEEK_SET);
             fwrite(&master, sizeof(master), 1, disco);
@@ -749,7 +749,7 @@ void eliminarParticion(part entrada)
         {
             partition nuevo;
             nuevo.part_status = 'n';
-            nuevo.part_type = NULL;
+            nuevo.part_type = '0';
             master.mbr_partition_2 = nuevo;
             fseek(disco, 0, SEEK_SET);
             fwrite(&master, sizeof(master), 1, disco);
@@ -778,7 +778,7 @@ void eliminarParticion(part entrada)
         {
             partition nuevo;
             nuevo.part_status = 'n';
-            nuevo.part_type = NULL;
+            nuevo.part_type = '0';
             master.mbr_partition_3 = nuevo;
             fseek(disco, 0, SEEK_SET);
             fwrite(&master, sizeof(master), 1, disco);
@@ -794,7 +794,7 @@ void eliminarParticion(part entrada)
             }
             partition nuevo;
             nuevo.part_status = 'n';
-            nuevo.part_type = NULL;
+            nuevo.part_type = '0';
             master.mbr_partition_3 = nuevo;
             fseek(disco, 0, SEEK_SET);
             fwrite(&master, sizeof(master), 1, disco);
@@ -807,7 +807,7 @@ void eliminarParticion(part entrada)
         {
             partition nuevo;
             nuevo.part_status = 'n';
-            nuevo.part_type = NULL;
+            nuevo.part_type = '0';
             master.mbr_partition_4 = nuevo;
             fseek(disco, 0, SEEK_SET);
             fwrite(&master, sizeof(master), 1, disco);
@@ -823,7 +823,7 @@ void eliminarParticion(part entrada)
             }
             partition nuevo;
             nuevo.part_status = 'n';
-            nuevo.part_type = NULL;
+            nuevo.part_type = '0';
             master.mbr_partition_4 = nuevo;
             fseek(disco, 0, SEEK_SET);
             fwrite(&master, sizeof(master), 1, disco);

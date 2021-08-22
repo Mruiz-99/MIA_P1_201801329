@@ -12,12 +12,21 @@
 using namespace std;
 
 #include "structures.h"
+
+int discos=1;
+vector<mnt> particionesMontadas;
+string montada = "";
+vector<string>letras = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
+
+
+
 #include "exec.h"
 #include "mkdisk.h"
 #include "rmdisk.h"
 #include "fdisk.h"
+#include "mount.h"
+#include "unmount.h"
 
-int discos=1;
 
 void ejecutar (string cmd){
     if(cmd.size()!=0){
@@ -29,6 +38,10 @@ void ejecutar (string cmd){
             rmdisk(partes);
         }else if(lower(partes[0])=="fdisk"){
             fdisk(partes);
+        }else if(lower(partes[0])=="mount"){
+            mount(partes);
+        }else if(lower(partes[0])=="umount"){
+            umount(partes);
         }
     }    
 }
@@ -48,6 +61,7 @@ int main(){
     }
 }
 /*
+Comandos de prueba
 MKdisk -size=3000 -u=k -path=/home/user/Disco1.dk
 fdisk -type=e -path=/home/user/Disco1.dk -u=k -size=300 -name=Particion1
 fdisk -size=600 -type=l  -u=B -f=ff -path=/home/user/Disco1.dk -name=Particion2

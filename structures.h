@@ -42,6 +42,11 @@ struct ebr{
     int part_next;
     char part_name[16];
 };
+struct mnt{
+    string id;
+    string path;
+    string name;
+};
  
 
 #include <iostream>
