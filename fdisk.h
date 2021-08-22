@@ -80,7 +80,7 @@ void free_space(ebr inicio, int realSize, partition extendida, part entrada, FIL
     {
         if (((extendida.part_start + extendida.part_size) - (inicio.part_start + inicio.part_size + sizeof(ebr))) > realSize)
         {
-            aux = {'a', entrada.ajuste, (inicio.part_start + inicio.part_size + sizeof(ebr) + 1), realSize, 0, 'a'};
+            aux = {'a', entrada.ajuste, int(inicio.part_start + inicio.part_size + sizeof(ebr) + 1), realSize, 0, 'a'};
             strcpy(aux.part_name, entrada.nombre.c_str());
             inicio.part_next = inicio.part_start + inicio.part_size + sizeof(ebr) + 1;
             fseek(disco, inicio.part_start, SEEK_SET);
@@ -98,7 +98,7 @@ void free_space(ebr inicio, int realSize, partition extendida, part entrada, FIL
     {
         if (((inicio.part_next) - (inicio.part_start + inicio.part_size + sizeof(ebr))) > realSize)
         {
-            aux = {'a', entrada.ajuste, (inicio.part_start + inicio.part_size + sizeof(ebr) + 1), realSize, inicio.part_next, 'a'};
+            aux = {'a', entrada.ajuste, int(inicio.part_start + inicio.part_size + sizeof(ebr) + 1), realSize, inicio.part_next, 'a'};
             strcpy(aux.part_name, entrada.nombre.c_str());
             inicio.part_next = inicio.part_start + inicio.part_size + sizeof(ebr) + 1;
             fseek(disco, inicio.part_start, SEEK_SET);
@@ -195,7 +195,7 @@ bool existeLogica(string nombre, int part_start, FILE *disco)
     {
         if (ebr.part_name == nombre)
         {
-            res =true;
+            res = true;
         }
         else if (ebr.part_next > 0)
         {
@@ -203,8 +203,7 @@ bool existeLogica(string nombre, int part_start, FILE *disco)
         }
         else
         {
-            res =false;
-            
+            res = false;
         }
     }
     else if (ebr.part_next > 0)
@@ -213,8 +212,7 @@ bool existeLogica(string nombre, int part_start, FILE *disco)
     }
     else
     {
-        res =false;
-        
+        res = false;
     }
     return res;
 }
@@ -229,8 +227,8 @@ bool existeParticion(string nombre, mbr master, FILE *disco)
         }
         else if (master.mbr_partition_1.part_type == 'e')
         {
-            bool res =bool(existeLogica(nombre, master.mbr_partition_1.part_start + sizeof(partition) + 1, disco));
-            if (res==true)
+            bool res = bool(existeLogica(nombre, master.mbr_partition_1.part_start + sizeof(partition) + 1, disco));
+            if (res == true)
             {
                 return true;
             }
@@ -654,7 +652,7 @@ void crearParticion(part entrada)
     fclose(disco);
 }
 
-bool eliminarLogica(string nombre, int part_start, FILE *disco, part entrada)
+bool eliminarLogica(string nombre, int part_start, FILE *disco, part entrada, string tipo)
 {
     ebr ebr;
     fseek(disco, part_start, SEEK_SET);
@@ -663,26 +661,44 @@ bool eliminarLogica(string nombre, int part_start, FILE *disco, part entrada)
     {
         if (ebr.part_name == nombre)
         {
-            res =true;
+            //eliminar
+            if (tipo == "fast")
+            {
+
+                ebr = {'n', NULL, ebr.part_start, 0, ebr.part_next, 'a'};
+                fseek(disco, part_start, SEEK_SET);
+                fwrite(&ebr, sizeof(ebr), 1, disco);
+            }
+            else if (tipo == "full")
+            {
+                char nulo = '\0';
+                for (int i = 0; i < ebr.part_size; i++)
+                {
+                    fseek(disco, part_start + i, SEEK_SET);
+                    fwrite(&nulo, sizeof(nulo), 1, disco);
+                }
+                ebr = {'n', NULL, ebr.part_start, 0, ebr.part_next, 'a'};
+                fseek(disco, part_start, SEEK_SET);
+                fwrite(&ebr, sizeof(ebr), 1, disco);
+            }
+            return true;
         }
         else if (ebr.part_next > 0)
         {
-            existeLogica(nombre, ebr.part_next, disco);
+            eliminarLogica(nombre, ebr.part_next, disco, entrada, tipo);
         }
         else
         {
-            res =false;
-            
+            res = false;
         }
     }
     else if (ebr.part_next > 0)
     {
-        existeLogica(nombre, ebr.part_next, disco);
+        eliminarLogica(nombre, ebr.part_next, disco, entrada, tipo);
     }
     else
     {
-        res =false;
-        
+        res = false;
     }
     return res;
 }
@@ -817,7 +833,14 @@ void eliminarParticion(part entrada)
     else if (existe_extendida(master))
     {
         partition extendida = obtenerParticionExtendida(master);
-        eliminarLogica(nombre,extendida.part_start+sizeof(partition+1, disco, entrada) )
+        if (eliminarLogica(nombre, extendida.part_start + sizeof(partition) + 1, disco, entrada, entrada.del))
+        {
+            cout << "Particion '" << nombre << "' eliminada correctamente" << endl;
+        }
+        else
+        {
+            cout << "Particion no encontrada" << endl;
+        }
     }
     else
     {
@@ -825,9 +848,63 @@ void eliminarParticion(part entrada)
     }
     fclose(disco);
 }
-bool addLogica(part entrada)
+bool addLogica(string nombre, int part_start, FILE *disco, part entrada, int anadir, partition extendida)
 {
-    return false;
+    ebr ebr;
+    fseek(disco, part_start, SEEK_SET);
+    fread(&ebr, sizeof(ebr), 1, disco);
+    if (ebr.part_status == 'a')
+    {
+        if (ebr.part_name == nombre)
+        {
+            //anadir
+            if (ebr.part_next > 0)
+            {
+                if ((ebr.part_start + sizeof(ebr) + ebr.part_size + anadir + 1) < ebr.part_next)
+                {
+                    ebr.part_size += anadir;
+                    fseek(disco, part_start, SEEK_SET);
+                    fwrite(&ebr, sizeof(ebr), 1, disco);
+                    res = true;
+                }
+                else
+                {
+                    cout << "No se pudo redimensionar la particion '" << entrada.nombre << "'" << endl;
+                    res = false;
+                }
+            }
+            else if ((extendida.part_start + sizeof(partition) + extendida.part_size) > (ebr.part_start + sizeof(ebr) + ebr.part_size + 1 + anadir))
+            {
+                ebr.part_size += anadir;
+                fseek(disco, part_start, SEEK_SET);
+                fwrite(&ebr, sizeof(ebr), 1, disco);
+                res = true;
+            }
+            else
+            {
+                cout << "No se pudo redimensionar la particion '" << entrada.nombre << "'" << endl;
+                res = false;
+            }
+
+        }
+        else if (ebr.part_next > 0)
+        {
+            addLogica(nombre, ebr.part_next, disco, entrada, anadir, extendida);
+        }
+        else
+        {
+            res = false;
+        }
+    }
+    else if (ebr.part_next > 0)
+    {
+        addLogica(nombre, ebr.part_next, disco, entrada, anadir, extendida);
+    }
+    else
+    {
+        res = false;
+    }
+    return res;
 }
 //Funcion para agregar o quitar espacion de una particion
 void addParticion(part entrada)
@@ -1003,14 +1080,21 @@ void addParticion(part entrada)
             cout << "No se pudo redimensionar la particion '" << entrada.nombre << "'" << endl;
         }
     }
-    else if (addLogica(entrada))
+    else if (existe_extendida(master))
     {
+        partition extendida = obtenerParticionExtendida(master);
+        if (addLogica(nombre, extendida.part_start + sizeof(partition) + 1, disco, entrada, anadir, extendida))
+        {
+            cout << "Particion '" << nombre << "' redimensionada correctamente" << endl;
+        }
+        else
+        {
+            cout << "Error no se pudo redimensionar la particion" << endl;
+        }
     }
     else
     {
         cout << "Particion no encontrada" << endl;
-        //fdisk -delete=Full -path=/home/user/Disco1.dk -name=Particion2
-        //fdisk -add=5000 -u=B -path=/home/user/Disco1.dk -name=Particion1
     }
     fclose(disco);
 }

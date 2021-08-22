@@ -50,6 +50,9 @@ int main(){
 /*
 MKdisk -size=3000 -u=k -path=/home/user/Disco1.dk
 fdisk -type=e -path=/home/user/Disco1.dk -u=k -size=300 -name=Particion1
-fdisk -size=1 -type=l  -u=k -f=ff -path=/home/user/Disco1.dk -name=Particion2
+fdisk -size=600 -type=l  -u=B -f=ff -path=/home/user/Disco1.dk -name=Particion2
 fdisk -size=1 -type=p -u=k -f=ff -path=/home/user/Disco1.dk -name=Particion2
+fdisk -delete=fast -path=/home/user/Disco1.dk -name=Particion2
+fdisk -add=50 -u=B -path=/home/user/Disco1.dk -name=Particion4
+
 */
