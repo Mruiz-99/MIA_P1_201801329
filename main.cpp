@@ -17,6 +17,7 @@ int discos=1;
 vector<mnt> particionesMontadas;
 string montada = "";
 vector<string>letras = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
+int fsys=1;
 
 
 
@@ -26,6 +27,8 @@ vector<string>letras = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n",
 #include "fdisk.h"
 #include "mount.h"
 #include "unmount.h"
+#include "rep.h"
+#include "mkfs.h"
 
 
 void ejecutar (string cmd){
@@ -42,6 +45,43 @@ void ejecutar (string cmd){
             mount(partes);
         }else if(lower(partes[0])=="umount"){
             umount(partes);
+        }else if(lower(partes[0])=="mkfs"){
+            mkfs(partes);
+        }else if(lower(partes[0])=="rep"){
+            rep(partes);
+        }else if(lower(partes[0])=="exec"){
+            string path = "";
+            bool problem=false;
+            for(int i=0;i<partes.size();i++){
+                vector<string> componentes = split(partes[i],"=");
+                if(lower(componentes[0])=="exec"){
+                }else if(lower(componentes[0])=="-path"){
+                    path = quitarComillas(componentes[1]);
+                }else{
+                    cout<<"Atributo '"<<componentes[0]<<"' no valido"<<endl;
+                    problem=true;
+                }
+            }
+            if(problem==true){
+            }else if(path==""){
+                cout<<"Parametros obligatorios incompletos"<<endl;
+            }else{
+                ifstream archivo;
+                archivo.open(path, ios::in);
+                if(archivo.fail()){
+                    cout<<"El archivo no se pudo abrir"<<endl;
+                }else{
+                    while (!archivo.eof()){
+                        string contenido;
+                        getline(archivo,contenido);
+                        if(contenido.size()!=0){
+                            cout<<contenido<<endl;
+                            ejecutar(automata(contenido));
+                        }
+                    }
+                    
+                }
+            }
         }
     }    
 }

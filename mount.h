@@ -4,6 +4,16 @@
 
 using namespace std;
 
+//Funcion que retorna el nombre de la particion en la posicion N 
+string obtenerN(string id){
+    for(int i=0;i<particionesMontadas.size();i++){
+        if((particionesMontadas[i].id==id)){
+            return particionesMontadas[i].name;
+        }
+    }
+    return "";
+}
+
 //Funcion que busca si una particion ya esta montada en memoria
 bool existeMontada(string id){
     for( int i=0; i < particionesMontadas.size();i++){

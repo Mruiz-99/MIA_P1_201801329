@@ -47,6 +47,63 @@ struct mnt{
     string path;
     string name;
 };
+
+struct fs{
+    string id;
+    string type;
+    string fileS;
+};
+
+struct report{
+    string name;
+    string path;
+    string id;
+    string ruta;
+};
+
+struct superblock{
+    int s_filesystem_type;
+    int s_inodes_count;
+    int s_blocks_count;
+    int s_free_blocks_count;
+    int s_free_inodes_count;
+    time_t s_mtime;
+    time_t s_umtime;
+    int s_mnt_count;
+    int s_magic;
+    int s_inode_size;
+    int s_block_size;
+    int s_first_ino;
+    int s_first_blo;
+    int s_bm_inode_start;
+    int s_bm_block_start;
+    int s_inode_start;
+    int s_block_start;
+};
+struct inode{
+    int i_uid;
+    int i_gid;
+    int i_size;
+    time_t i_atime;
+    time_t i_ctime;
+    time_t i_mtime;
+    int i_block[15];
+    char i_type;
+    int i_perm;
+};
+struct content{
+    char b_name[12];
+    int b_inode;
+};
+struct dirBlock{
+    content b_content[4];
+};
+struct fileBlock{
+    char b_content[64];
+};
+struct ptrBlock{
+    int b_pointers[16];
+};
  
 
 #include <iostream>
