@@ -47,6 +47,11 @@ struct mnt{
     string path;
     string name;
 };
+struct l_user{
+    string user;
+    string pass;
+    string id;
+};
 
 struct fs{
     string id;

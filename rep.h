@@ -947,116 +947,7 @@ void reportarDisk(report reporte)
         cout << "Identificador de particion no valido" << endl;
     }
 }
-void bm_inode(report reporte)
-{
-    if (obtenerDireccion(reporte.id) != "")
-    {
-        FILE *disco;
-        string dir = obtenerDireccion(reporte.id);
-        if (disco = fopen(dir.c_str(), "rb+"))
-        {
-            mbr master;
-            fseek(disco, 0, SEEK_SET);
-            fread(&master, sizeof(mbr), 1, disco);
-            partition particion = obtenerParticion(master, obtenerN(reporte.id));
-            superblock sb;
-            fseek(disco, particion.part_start, SEEK_SET);
-            fread(&sb, sizeof(superblock), 1, disco);
-            char bm[sb.s_inodes_count];
-            fseek(disco, sb.s_bm_inode_start, SEEK_SET);
-            for (int i = 0; i < sb.s_inodes_count; i++)
-            {
-                fread(&bm[i], sizeof(char), 1, disco);
-            }
-            fclose(disco);
-            ofstream salida;
-            salida.open(reporte.path);
-            string txt = "";
-            int cont = (int)((float)(strlen(bm)) / (float)(20)) + 1;
-            int bits = 0;
-            for (int i = 0; i < cont; i++)
-            {
-                for (int j = 0; j < 20; j++)
-                {
-                    if (bits < strlen(bm))
-                    {
-                        string tmp;
-                        tmp.push_back(bm[bits]);
-                        txt += tmp + "     ";
-                        bits++;
-                    }
-                }
-                txt += "\n";
-            }
-            salida << txt;
-            salida.close();
-            cout << "Reporte creado exitosamente" << endl;
-        }
-        else
-        {
-            cout << "No existe el disco" << endl;
-        }
-    }
-    else
-    {
-        cout << "La direccion del disco no fue encontrada" << endl;
-    }
-}
-void bm_block(report reporte)
-{
-    if (obtenerDireccion(reporte.id) != "")
-    {
-        FILE *disco;
-        string dir = obtenerDireccion(reporte.id);
-        if (disco = fopen(dir.c_str(), "rb+"))
-        {
-            mbr master;
-            fseek(disco, 0, SEEK_SET);
-            fread(&master, sizeof(mbr), 1, disco);
-            partition particion = obtenerParticion(master, obtenerN(reporte.id));
-            superblock sb;
-            fseek(disco, particion.part_start, SEEK_SET);
-            fread(&sb, sizeof(superblock), 1, disco);
-            char bm[sb.s_blocks_count];
-            fseek(disco, sb.s_bm_block_start, SEEK_SET);
-            for (int i = 0; i < sb.s_blocks_count; i++)
-            {
-                fread(&bm[i], sizeof(char), 1, disco);
-            }
-            fclose(disco);
-            ofstream salida;
-            salida.open(reporte.path);
-            string txt = "";
-            int cont = (int)((float)(strlen(bm)) / (float)(20)) + 1;
-            int bits = 0;
-            for (int i = 0; i < cont; i++)
-            {
-                for (int j = 0; j < 20; j++)
-                {
-                    if (bits < strlen(bm))
-                    {
-                        string tmp;
-                        tmp.push_back(bm[bits]);
-                        txt += tmp + "     ";
-                        bits++;
-                    }
-                }
-                txt += "\n";
-            }
-            salida << txt;
-            salida.close();
-            cout << "Reporte creado exitosamente" << endl;
-        }
-        else
-        {
-            cout << "No existe el disco" << endl;
-        }
-    }
-    else
-    {
-        cout << "La direccion del disco no fue encontrada" << endl;
-    }
-}
+
 void sb(report reporte)
 {
     if (obtenerDireccion(reporte.id) != "")
@@ -1183,24 +1074,16 @@ void block(report reporte)
         cout << "La direccion del disco no fue encontrada" << endl;
     }
 }
-string generarTI(inode temporal, int num)
+string generarTI(inode temporal, int num,dirBlock bq)
 {
-    string salida = "<table>\n<tr><td border=\"0\">Inodo " + to_string(num) + "</td><td border=\"0\"></td></tr>\n";
-    salida += "<tr><td border=\"0\">i_uid</td><td border=\"0\">" + to_string(temporal.i_uid) + "</td></tr>\n";
-    salida += "<tr><td border=\"0\">i_size</td><td border=\"0\">" + to_string(temporal.i_size) + "</td></tr>\n";
-    char fecha[20];
-    tm *reg = localtime(&temporal.i_atime);
-    strftime(fecha, 20, "%d/%m/%Y %H:%M:%S", reg);
-    salida += "<tr><td border=\"0\">i_atime</td><td border=\"0\">" + convertToString(fecha, 20) + "" + "</td></tr>\n";
-    salida += "<tr><td border=\"0\">.</td><td border=\"0\"></td></tr>\n";
-    for (int i = 0; i < (int)(sizeof(temporal.i_block) / sizeof(int)); i++)
+    string aux;
+    if (temporal.i_type==0)
     {
-        salida += "<tr><td border=\"0\">i_block_" + to_string(i) + "</td><td border=\"0\">" + to_string(temporal.i_block[i]) + "</td></tr>\n";
+        aux = "Carpeta";
+    }else{
+        aux = "Archivo";
     }
-    salida += "<tr><td border=\"0\">.</td><td border=\"0\"></td></tr>\n";
-    salida += "<tr><td border=\"0\">i_perm</td><td border=\"0\">" + to_string(temporal.i_perm) + "</td></tr>\n";
-    salida += "<tr><td border=\"0\">.</td><td border=\"0\"></td></tr>\n";
-    salida += "</table>";
+    string salida = "<tr><td border=\"1\">"+to_string(num)+"</td><td border=\"1\">"+aux+"</td><td border=\"1\"> /"+bq.b_content[2].b_name+"</td></tr>\n";
     return salida;
 }
 void in(report reporte)
@@ -1225,6 +1108,7 @@ void in(report reporte)
                 fread(&bm[i], sizeof(char), 1, disco);
             }
             string salida = "digraph grafo{\nrankdir=LR;\nnode[shape=plaintext];\n";
+            salida += "p1[shape=record label=<<table>\n<tr><td border=\"1\">Index</td><td border=\"1\">Tipo</td><td border=\"1\">Nombre</td></tr>\n";
             for (int i = 0; i < strlen(bm); i++)
             {
                 if (bm[i] == '1')
@@ -1232,13 +1116,13 @@ void in(report reporte)
                     fseek(disco, sb.s_inode_start + (int)(i * sizeof(inode)), SEEK_SET);
                     inode temp;
                     fread(&temp, sizeof(inode), 1, disco);
-                    salida += "n" + to_string(i) + "[label=<" + generarTI(temp, i) + ">];\n";
-                    if (i != 0)
-                    {
-                        salida += "n" + to_string(i - 1) + " -> n" + to_string(i) + ";\n";
-                    }
+                    fseek(disco,sb.s_block_start,SEEK_SET);
+                    dirBlock bl;
+                    fread(&bl, sizeof(dirBlock), 1, disco);
+                    salida += generarTI(temp, i,bl);
                 }
             }
+            salida += "</table>>];";
             salida += "\n}";
             string dot = split(reporte.path, ".")[0] + ".dot";
             fclose(disco);
@@ -1308,9 +1192,8 @@ void rep(vector<string> partes)
     {
         cout << "Parametros obligatorios incompletos" << endl;
     }
-    else if (((lower(reporte.name) == "file") || (lower(reporte.name) == "ls")) && (reporte.ruta == ""))
-    {
-        cout << "Ruta del archivo o carpeta no especificada" << endl;
+    else if(((lower(reporte.name)=="file")||(lower(reporte.name)=="ls"))&&(reporte.ruta=="")){
+        cout<<"Ruta del archivo o carpeta no especificada"<<endl;
     }
     else
     {
@@ -1321,14 +1204,6 @@ void rep(vector<string> partes)
         else if (lower(reporte.name) == "disk")
         {
             reportarDisk(reporte);
-        }
-        else if (lower(reporte.name) == "bm_inode")
-        {
-            bm_inode(reporte);
-        }
-        else if (lower(reporte.name) == "bm_block")
-        {
-            bm_block(reporte);
         }
         else if (lower(reporte.name) == "block")
         {
@@ -1352,4 +1227,5 @@ void rep(vector<string> partes)
 mount -path=/home/user/Disco1.dk -name=Particion1
 rep -id=291A -Path=/home/user/reportes/reporteMBR.jpg -name=mbR
 rep -id=291A -Path=/home/user/reportes/reporteDisco.jpg -name=DISK
+rep -id=291A -Path=/home/user/reportes/reporteInodo.jpg -name=Inode
 */

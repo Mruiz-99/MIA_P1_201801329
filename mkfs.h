@@ -69,7 +69,7 @@ void ext2(fs sistema){
             content c4;
             dirBlock b1 = {{c1,c2,c3,c4}};
             inode usr = {0,0,sizeof(fileBlock),time(0),time(0),time(0),{1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},'1',0};
-            fileBlock b2 = {"Usuarios"};
+            fileBlock b2 = {"1,G,root\n1,U,root,root,123"};
             fseek(disco,sb.s_inode_start,SEEK_SET);
             fwrite(&root,sizeof(root),1,disco);
             fwrite(&usr,sizeof(usr),1,disco);

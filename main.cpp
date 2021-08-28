@@ -7,19 +7,19 @@
 #include <sys/stat.h>
 #include <vector>
 
-
-
 using namespace std;
 
 #include "structures.h"
 
-int discos=1;
+int discos = 1;
+using std::cout; using std::cin;
 vector<mnt> particionesMontadas;
 string montada = "";
-vector<string>letras = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
-int fsys=1;
-
-
+vector<string> letras = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+int fsys = 1;
+//Usuario activo
+string usuario = "";
+string id = "";
 
 #include "exec.h"
 #include "mkdisk.h"
@@ -29,73 +29,133 @@ int fsys=1;
 #include "unmount.h"
 #include "rep.h"
 #include "mkfs.h"
+#include "login.h"
+#include "logout.h"
+#include "mkgrp.h"
 
-
-void ejecutar (string cmd){
-    if(cmd.size()!=0){
+void ejecutar(string cmd)
+{
+    if (cmd.size() != 0)
+    {
         vector<string> partes = splitt(cmd, tieneComillas(cmd));
-        if(lower(partes[0])=="mkdisk"){
+        if (lower(partes[0]) == "mkdisk")
+        {
             mkdisk(partes, discos);
             discos++;
-        }else if(lower(partes[0])=="rmdisk"){
+        }
+        else if (lower(partes[0]) == "rmdisk")
+        {
             rmdisk(partes);
-        }else if(lower(partes[0])=="fdisk"){
+        }
+        else if (lower(partes[0]) == "fdisk")
+        {
             fdisk(partes);
-        }else if(lower(partes[0])=="mount"){
+        }
+        else if (lower(partes[0]) == "mount")
+        {
             mount(partes);
-        }else if(lower(partes[0])=="umount"){
+        }
+        else if (lower(partes[0]) == "umount")
+        {
             umount(partes);
-        }else if(lower(partes[0])=="mkfs"){
+        }
+        else if (lower(partes[0]) == "mkfs")
+        {
             mkfs(partes);
-        }else if(lower(partes[0])=="rep"){
+        }
+        else if (lower(partes[0]) == "rep")
+        {
             rep(partes);
-        }else if(lower(partes[0])=="exec"){
+        }
+        else if (lower(partes[0]) == "login")
+        {
+            login(partes);
+        }
+        else if (lower(partes[0]) == "logout")
+        {
+            logout(partes);
+        }
+        else if (lower(partes[0]) == "mkgrp")
+        {
+            mkgrp(partes);
+        }
+        else if (lower(partes[0]) == "pause")
+        {
+            int flag;
+            cout << "Programa en pausa, presione la tecla ENTER para continuar" << endl;
+            flag = cin.get();
+        }
+        else if (lower(partes[0]) == "exec")
+        {
             string path = "";
-            bool problem=false;
-            for(int i=0;i<partes.size();i++){
-                vector<string> componentes = split(partes[i],"=");
-                if(lower(componentes[0])=="exec"){
-                }else if(lower(componentes[0])=="-path"){
+            bool problem = false;
+            for (int i = 0; i < partes.size(); i++)
+            {
+                vector<string> componentes = split(partes[i], "=");
+                if (lower(componentes[0]) == "exec")
+                {
+                }
+                else if (lower(componentes[0]) == "-path")
+                {
                     path = quitarComillas(componentes[1]);
-                }else{
-                    cout<<"Atributo '"<<componentes[0]<<"' no valido"<<endl;
-                    problem=true;
+                }
+                else
+                {
+                    cout << "Atributo '" << componentes[0] << "' no valido" << endl;
+                    problem = true;
                 }
             }
-            if(problem==true){
-            }else if(path==""){
-                cout<<"Parametros obligatorios incompletos"<<endl;
-            }else{
+            if (problem == true)
+            {
+            }
+            else if (path == "")
+            {
+                cout << "Parametros obligatorios incompletos" << endl;
+            }
+            else
+            {
                 ifstream archivo;
                 archivo.open(path, ios::in);
-                if(archivo.fail()){
-                    cout<<"El archivo no se pudo abrir"<<endl;
-                }else{
-                    while (!archivo.eof()){
+                if (archivo.fail())
+                {
+                    cout << "El archivo no se pudo abrir" << endl;
+                }
+                else
+                {
+                    while (!archivo.eof())
+                    {
                         string contenido;
-                        getline(archivo,contenido);
-                        if(contenido.size()!=0){
-                            cout<<contenido<<endl;
+                        getline(archivo, contenido);
+                        if (contenido.size() != 0)
+                        {
+                            cout << contenido << endl;
                             ejecutar(automata(contenido));
                         }
                     }
-                    
                 }
             }
         }
-    }    
+    }
 }
 
-int main(){
+int main()
+{
     string cmd;
     //Ciclo infinito para que la terminal pueda estar siempre en funcion
-    while(true){
-        //verifica si se desea salir del programa 
-        getline(cin,cmd);cout<<endl;
-        if((lower(cmd).compare("exit")==0)||(lower(cmd).compare("quit")==0)||(lower(cmd).compare("close")==0)||(lower(cmd).compare("salir")==0)){
+    while (true)
+    {
+        //verifica si se desea salir del programa
+        getline(cin, cmd);
+        cout << endl;
+        if ((lower(cmd).compare("exit") == 0) || (lower(cmd).compare("quit") == 0) || (lower(cmd).compare("close") == 0) || (lower(cmd).compare("salir") == 0))
+        {
             return 0;
-        }else if(cmd==""){
-        }else{
+        }
+        else if (cmd == "")
+        {
+        }
+        else
+        {
             ejecutar(automata(cmd));
         }
     }
