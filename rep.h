@@ -1074,19 +1074,19 @@ void block(report reporte)
         cout << "La direccion del disco no fue encontrada" << endl;
     }
 }
-string generarTI(inode temporal, int num,dirBlock bq)
+string generarTI(inode temporal, int num)
 {
     string aux;
-    if (temporal.i_type==0)
+    if (temporal.i_type=='0')
     {
         aux = "Carpeta";
     }else{
         aux = "Archivo";
     }
-    string salida = "<tr><td border=\"1\">"+to_string(num)+"</td><td border=\"1\">"+aux+"</td><td border=\"1\"> /"+bq.b_content[2].b_name+"</td></tr>\n";
+    string salida = "<tr><td border=\"1\">"+to_string(num)+"</td><td border=\"1\">"+aux+"</td><td border=\"1\"> "+temporal.nombre+"</td></tr>\n";
     return salida;
 }
-void in(report reporte)
+bool in(report reporte)
 {
     if (obtenerDireccion(reporte.id) != "")
     {
@@ -1107,6 +1107,7 @@ void in(report reporte)
             {
                 fread(&bm[i], sizeof(char), 1, disco);
             }
+            inode temp;
             string salida = "digraph grafo{\nrankdir=LR;\nnode[shape=plaintext];\n";
             salida += "p1[shape=record label=<<table>\n<tr><td border=\"1\">Index</td><td border=\"1\">Tipo</td><td border=\"1\">Nombre</td></tr>\n";
             for (int i = 0; i < strlen(bm); i++)
@@ -1114,12 +1115,8 @@ void in(report reporte)
                 if (bm[i] == '1')
                 {
                     fseek(disco, sb.s_inode_start + (int)(i * sizeof(inode)), SEEK_SET);
-                    inode temp;
                     fread(&temp, sizeof(inode), 1, disco);
-                    fseek(disco,sb.s_block_start,SEEK_SET);
-                    dirBlock bl;
-                    fread(&bl, sizeof(dirBlock), 1, disco);
-                    salida += generarTI(temp, i,bl);
+                    salida += generarTI(temp, i);
                 }
             }
             salida += "</table>>];";
@@ -1133,6 +1130,7 @@ void in(report reporte)
             string cmd = "dot -T" + lower(split(reporte.path, ".")[1]) + " \"" + dot + "\" -o \"" + reporte.path + "\"";
             system(cmd.c_str());
             cout << "Reporte creado exitosamente" << endl;
+            return false;
         }
         else
         {
@@ -1143,6 +1141,7 @@ void in(report reporte)
     {
         cout << "La direccion del disco no fue encontrada" << endl;
     }
+    return false;
 }
 //Funcion de comando rep que verifica los parametros ingresados
 void rep(vector<string> partes)
@@ -1228,4 +1227,5 @@ mount -path=/home/user/Disco1.dk -name=Particion1
 rep -id=291A -Path=/home/user/reportes/reporteMBR.jpg -name=mbR
 rep -id=291A -Path=/home/user/reportes/reporteDisco.jpg -name=DISK
 rep -id=291A -Path=/home/user/reportes/reporteInodo.jpg -name=Inode
+rep -id=291A -Path=/home/user/reportes/reporteSB.jpg -name=sb
 */

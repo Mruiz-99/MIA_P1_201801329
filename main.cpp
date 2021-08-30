@@ -16,7 +16,7 @@ using std::cout; using std::cin;
 vector<mnt> particionesMontadas;
 string montada = "";
 vector<string> letras = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
-int fsys = 1;
+int fsys = 0;
 //Usuario activo
 string usuario = "";
 string id = "";
@@ -32,6 +32,8 @@ string id = "";
 #include "login.h"
 #include "logout.h"
 #include "mkgrp.h"
+#include "rmgrp.h"
+#include "mkusr.h"
 
 void ejecutar(string cmd)
 {
@@ -78,6 +80,14 @@ void ejecutar(string cmd)
         else if (lower(partes[0]) == "mkgrp")
         {
             mkgrp(partes);
+        }
+        else if (lower(partes[0]) == "rmgrp")
+        {
+            rmgrp(partes);
+        }
+        else if (lower(partes[0]) == "mkusr")
+        {
+            mkusr(partes);
         }
         else if (lower(partes[0]) == "pause")
         {

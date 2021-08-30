@@ -52,6 +52,11 @@ struct l_user{
     string pass;
     string id;
 };
+struct new_user{
+    string user;
+    string pass;
+    string group;
+};
 
 struct fs{
     string id;
@@ -95,6 +100,7 @@ struct inode{
     int i_block[15];
     char i_type;
     int i_perm;
+    char nombre[15];
 };
 struct content{
     char b_name[12];

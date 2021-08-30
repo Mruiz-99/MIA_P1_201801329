@@ -100,5 +100,7 @@ void mount (vector<string> partes){
 mount -path=/home/user/Disco1.dk -name=Particion1
 umount -id=291a
 mkfs -type=full -id=291A
-mkgrp -name=USUARIO
+mkgrp -name=USUARIOs
+rmgrp -name=USUARIO
+mkusr -usr=user1 -pwd=usuario -grp=root
 */

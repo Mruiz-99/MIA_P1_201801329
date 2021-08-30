@@ -6,7 +6,7 @@
 using namespace std;
 
 //Funcion que monta una particion a memoria
-bool mkgroup(string nombre)
+bool rmgroup(string nombre)
 {
     if (usuario == "root")
     {
@@ -27,7 +27,6 @@ bool mkgroup(string nombre)
             vector<string> usuarios = split(b2.b_content, "\n");
             bool existe = false;
             string aux = "";
-            int ultimo_grp = 0;
             for (int i = 0; i < usuarios.size(); i++)
             {
                 vector<string> partes = split(usuarios[i], ",");
@@ -39,7 +38,6 @@ bool mkgroup(string nombre)
                     }
                     else
                     {
-                        ultimo_grp = stoi(partes[0]);
                         aux += partes[0] + "," + partes[1] + "," + partes[2] + "\n";
                     }
                 }
@@ -50,16 +48,18 @@ bool mkgroup(string nombre)
             }
             if (existe == false)
             {
-                ultimo_grp += 1;
-                aux += to_string(ultimo_grp) + ",G," + nombre + "\n";
-                fseek(disco, sb.s_block_start + sizeof(b1), SEEK_SET);
-                memmove(b2.b_content, aux.c_str(), aux.length());
-                fwrite(&b2, sizeof(b2), 1, disco);
-                cout << "Grupo creado, proceso realizado exitosamente" << endl;
+                cout << "Error, NO existe un grupo actualmente con ese nombre, intentelo de nuevo" << endl;
+                
             }
             else
             {
-                cout << "Error, existe un grupo actualmente con ese nombre, intentelo de nuevo" << endl;
+                fileBlock b2 = {"1,G,root\n1,U,root,root,123"};
+                fseek(disco, sb.s_block_start + sizeof(b1), SEEK_SET);
+                fwrite(&b2, sizeof(b2), 1, disco);
+                fseek(disco, sb.s_block_start + sizeof(b1), SEEK_SET);
+                memmove(b2.b_content, aux.c_str(), aux.length());
+                fwrite(&b2, sizeof(b2), 1, disco);
+                cout << "Grupo eliminado exitosamente" << endl;
             }
 
             fclose(disco);
@@ -79,14 +79,14 @@ bool mkgroup(string nombre)
     }
 }
 
-void mkgrp(vector<string> partes)
+void rmgrp(vector<string> partes)
 {
     string nombre = "";
     bool problem = false;
     for (int i = 0; i < partes.size(); i++)
     {
         vector<string> componenetes = split(partes[i], "=");
-        if (lower(componenetes[0]) == "mkgrp")
+        if (lower(componenetes[0]) == "rmgrp")
         {
             //reconoce el primer parametro con la palabra mount
         }
@@ -109,6 +109,6 @@ void mkgrp(vector<string> partes)
     }
     else
     {
-        mkgroup(nombre);
+        rmgroup(nombre);
     }
 }

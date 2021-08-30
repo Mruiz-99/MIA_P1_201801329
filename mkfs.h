@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <stdio.h>
 #include <string.h>
 
 using namespace std;
@@ -13,7 +14,7 @@ void ext2(fs sistema){
             fread(&master,sizeof(master),1,disco);
             partition particion = obtenerParticion(master,obtenerN(sistema.id));
             superblock sb;
-            int n = (int) ((float)(particion.part_size-sizeof(sb))/(float)(sizeof(inode)+sizeof(fileBlock)+4));
+            int n = (int) ((float)(particion.part_size-sizeof(sb)-(100*sizeof(fileBlock)))/(float)(sizeof(inode)+(3*sizeof(fileBlock))+4));
             sb.s_filesystem_type = 2;
             sb.s_inodes_count = n;
             sb.s_blocks_count = 3*n;
@@ -62,13 +63,13 @@ void ext2(fs sistema){
                     fwrite(&bloque,sizeof(bloque),1,disco);
                 }
             }
-            inode root = {0,0,sizeof(fileBlock),time(0),time(0),time(0),{0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},'0',0};
+            inode root = {0,0,sizeof(fileBlock),time(0),time(0),time(0),{0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},'0',0,'/'};
             content c1 = {".",0};
             content c2 = {"..",-1};
             content c3 = {"user.txt",1};
             content c4;
             dirBlock b1 = {{c1,c2,c3,c4}};
-            inode usr = {0,0,sizeof(fileBlock),time(0),time(0),time(0),{1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},'1',0};
+            inode usr = {0,0,sizeof(fileBlock),time(0),time(0),time(0),{1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},'1',0,"/user.txt"};
             fileBlock b2 = {"1,G,root\n1,U,root,root,123"};
             fseek(disco,sb.s_inode_start,SEEK_SET);
             fwrite(&root,sizeof(root),1,disco);

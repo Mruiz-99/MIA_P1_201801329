@@ -47,6 +47,7 @@ bool logear(l_user user)
                             }
                         }
                     }
+                
                 }
                 if (ingreso == false)
                 {
@@ -69,6 +70,7 @@ bool logear(l_user user)
     {
         cout << "Error, hay una cuenta de usuario activa, debe cerrar sesion" << endl;
     }
+    return false;
 }
 
 void login(vector<string> partes)
