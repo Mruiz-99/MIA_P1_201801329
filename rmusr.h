@@ -6,7 +6,7 @@
 using namespace std;
 
 //Funcion que monta una particion a memoria
-bool rmgroup(string nombre)
+bool rmuser(string nombre)
 {
     if (usuario == "root")
     {
@@ -57,25 +57,26 @@ bool rmgroup(string nombre)
             for (int i = 0; i < usuarios.size(); i++)
             {
                 vector<string> partes = split(usuarios[i], ",");
-                if ((partes[1] == "g") || (partes[1] == "G"))
+                if ((partes[1] == "u") || (partes[1] == "U"))
                 {
-                    if (partes[2] == nombre)
+                    if (partes[3] == nombre)
                     {
                         existe = true;
                     }
                     else
                     {
-                        aux += partes[0] + "," + partes[1] + "," + partes[2] + "\n";
+                        aux += partes[0] + "," + partes[1] + "," + partes[2] + "," + partes[3] + "," + partes[4] + "\n";
+                        
                     }
                 }
                 else
                 {
-                    aux += partes[0] + "," + partes[1] + "," + partes[2] + "," + partes[3] + "," + partes[4] + "\n";
+                    aux += partes[0] + "," + partes[1] + "," + partes[2] + "\n";
                 }
             }
             if (existe == false)
             {
-                cout << "Error, NO existe un grupo actualmente con ese nombre, intentelo de nuevo" << endl;
+                cout << "Error, NO existe un usuario actualmente con ese nombre, intentelo de nuevo" << endl;
             }
             else
             {
@@ -107,7 +108,7 @@ bool rmgroup(string nombre)
                         fwrite(&b2, sizeof(b2), 1, disco);
                     }
                 }
-                cout << "Grupo eliminado exitosamente" << endl;
+                cout << "Usuario eliminado exitosamente" << endl;
             }
 
             fclose(disco);
@@ -127,18 +128,18 @@ bool rmgroup(string nombre)
     }
 }
 
-void rmgrp(vector<string> partes)
+void rmusr(vector<string> partes)
 {
     string nombre = "";
     bool problem = false;
     for (int i = 0; i < partes.size(); i++)
     {
         vector<string> componenetes = split(partes[i], "=");
-        if (lower(componenetes[0]) == "rmgrp")
+        if (lower(componenetes[0]) == "rmusr")
         {
             //reconoce el primer parametro con la palabra mount
         }
-        else if (lower(componenetes[0]) == "-name")
+        else if (lower(componenetes[0]) == "-usr")
         {
             nombre = lower(quitarComillas(componenetes[1]));
         }
@@ -157,6 +158,6 @@ void rmgrp(vector<string> partes)
     }
     else
     {
-        rmgroup(nombre);
+        rmuser(nombre);
     }
 }

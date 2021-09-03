@@ -34,6 +34,7 @@ string id = "";
 #include "mkgrp.h"
 #include "rmgrp.h"
 #include "mkusr.h"
+#include "rmusr.h"
 
 void ejecutar(string cmd)
 {
@@ -88,6 +89,10 @@ void ejecutar(string cmd)
         else if (lower(partes[0]) == "mkusr")
         {
             mkusr(partes);
+        }
+        else if (lower(partes[0]) == "rmusr")
+        {
+            rmusr(partes);
         }
         else if (lower(partes[0]) == "pause")
         {
@@ -174,9 +179,10 @@ int main()
 Comandos de prueba
 MKdisk -size=3000 -u=k -path=/home/user/Disco1.dk
 fdisk -type=e -path=/home/user/Disco1.dk -u=k -size=300 -name=Particion1
-fdisk -size=600 -type=l  -u=B -f=ff -path=/home/user/Disco1.dk -name=Particion2
-fdisk -size=1 -type=p -u=k -f=ff -path=/home/user/Disco1.dk -name=Particion2
+fdisk -size=60000 -type=l  -u=B -f=ff -path=/home/user/Disco1.dk -name=Particion2
+fdisk -size=100 -type=p -u=k -f=ff -path=/home/user/Disco1.dk -name=Particion2
 fdisk -delete=fast -path=/home/user/Disco1.dk -name=Particion2
 fdisk -add=50 -u=B -path=/home/user/Disco1.dk -name=Particion4
+exec -path=/home/mruiz/Documentos/PROYECTOS-MIA/MIA_P1_201801329/prueba1.txt
 
 */

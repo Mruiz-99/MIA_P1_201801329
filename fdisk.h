@@ -4,6 +4,7 @@
 
 using namespace std;
 bool res;
+ebr ebr1;
 //Funcion que obtiene una particion en un disco en especifico
 partition obtenerParticion(mbr master, string name)
 {
@@ -188,27 +189,27 @@ partition obtenerParticionExtendida(mbr master)
 //Funcion que verifica si existe una particion logica en especifico
 bool existeLogica(string nombre, int part_start, FILE *disco)
 {
-    ebr ebr;
+    ebr ebr1;
     fseek(disco, part_start, SEEK_SET);
-    fread(&ebr, sizeof(ebr), 1, disco);
-    if (ebr.part_status == 'a')
+    fread(&ebr1, sizeof(ebr), 1, disco);
+    if (ebr1.part_status == 'a')
     {
-        if (ebr.part_name == nombre)
+        if (ebr1.part_name == nombre)
         {
             res = true;
         }
-        else if (ebr.part_next > 0)
+        else if (ebr1.part_next > 0)
         {
-            existeLogica(nombre, ebr.part_next, disco);
+            existeLogica(nombre, ebr1.part_next, disco);
         }
         else
         {
             res = false;
         }
     }
-    else if (ebr.part_next > 0)
+    else if (ebr1.part_next > 0)
     {
-        existeLogica(nombre, ebr.part_next, disco);
+        existeLogica(nombre, ebr1.part_next, disco);
     }
     else
     {
@@ -216,9 +217,46 @@ bool existeLogica(string nombre, int part_start, FILE *disco)
     }
     return res;
 }
+//Funcion que verifica si existe una particion logica en especifico
+ebr obtenerLogica(string nombre, int part_start, FILE *disco)
+{
+
+    ebr ebr2;
+    fseek(disco, part_start, SEEK_SET);
+    fread(&ebr2, sizeof(ebr), 1, disco);
+    if (ebr2.part_status == 'a')
+    {
+        if (ebr2.part_name == nombre)
+        {
+             ebr1= ebr2;
+        }
+        else if (ebr2.part_next > 0)
+        {
+            obtenerLogica(nombre, ebr2.part_next, disco);
+        }
+        else
+        {
+            ebr aux;
+            aux.part_status = 'n';
+            ebr1 = aux;
+        }
+    }
+    else if (ebr2.part_next > 0)
+    {
+        obtenerLogica(nombre, ebr2.part_next, disco);
+    }
+    else
+    {
+        ebr aux;
+        aux.part_status = 'n';
+        ebr1 = aux;
+    }
+    return ebr1;
+}
 //Funcion que verifica si existe una particion en especifico
 bool existeParticion(string nombre, mbr master, FILE *disco)
 {
+    
     if (master.mbr_partition_1.part_status == 'a')
     {
         if (master.mbr_partition_1.part_name == nombre)
@@ -885,7 +923,6 @@ bool addLogica(string nombre, int part_start, FILE *disco, part entrada, int ana
                 cout << "No se pudo redimensionar la particion '" << entrada.nombre << "'" << endl;
                 res = false;
             }
-
         }
         else if (ebr.part_next > 0)
         {
@@ -1190,7 +1227,7 @@ void fdisk(vector<string> partes)
         }
         else if (lower(componentes[0]) == "-name")
         {
-            particion.nombre = quitarComillas(componentes[1]);
+            particion.nombre = quitarComillas(lower(componentes[1]));
         }
         else if (lower(componentes[0]) == "-add")
         {

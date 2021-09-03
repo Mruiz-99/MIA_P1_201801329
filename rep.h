@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <string.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -222,39 +223,41 @@ string generarExtend(int part_start, float p, FILE *disco, partition extendida)
     {
         float porcentaje = ((float)(ebr.part_next - (ebr.part_start + sizeof(ebr) + 1)) / (float)(extendida.part_size)) * 100;
         salida2 += "l" + to_string(c_disk) + "[ shape=record label=<<table border=\"0\"><tr><td>Libre</td></tr><tr><td>" + to_string(porcentaje) + "% del disco</td></tr></table>>];\n";
-        generarExtend(ebr.part_next,porcentaje, disco, extendida);
+        generarExtend(ebr.part_next, porcentaje, disco, extendida);
     }
     else if ((ebr.part_status == 'a') && (ebr.part_next == 0))
     {
         float porcentaje = ((float)((ebr.part_size) / (float)(extendida.part_size))) * 100;
-        salida2 += "ebr"+to_string(c_disk)+"[shape=record label=\"EBR\"];\n";
-        salida2 += "l" + to_string(c_disk) + "[ shape=record label=<<table border=\"0\"><tr><td>"+convertToString(ebr.part_name, 16)+"</td></tr><tr><td>" + to_string(porcentaje) + "% del disco</td></tr></table>>];\n";
-        if(((extendida.part_start + sizeof(partition) + extendida.part_size)- (ebr.part_start + ebr.part_size + sizeof(ebr) +1))>0){
-            c_disk+=1;
-             float porcentaje = ((float)((extendida.part_start + sizeof(partition) + extendida.part_size) - (ebr.part_start + ebr.part_size+ sizeof(ebr) + 1)) / (float)(extendida.part_size)) * 100;
+        salida2 += "ebr" + to_string(c_disk) + "[shape=record label=\"EBR\"];\n";
+        salida2 += "l" + to_string(c_disk) + "[ shape=record label=<<table border=\"0\"><tr><td>" + convertToString(ebr.part_name, 16) + "</td></tr><tr><td>" + to_string(porcentaje) + "% del disco</td></tr></table>>];\n";
+        if (((extendida.part_start + sizeof(partition) + extendida.part_size) - (ebr.part_start + ebr.part_size + sizeof(ebr) + 1)) > 0)
+        {
+            c_disk += 1;
+            float porcentaje = ((float)((extendida.part_start + sizeof(partition) + extendida.part_size) - (ebr.part_start + ebr.part_size + sizeof(ebr) + 1)) / (float)(extendida.part_size)) * 100;
             salida2 += "l" + to_string(c_disk) + "[ shape=record label=<<table border=\"0\"><tr><td>Libre</td></tr><tr><td>" + to_string(porcentaje) + "% del disco</td></tr></table>>];\n";
         }
-    
     }
     else if ((ebr.part_status == 'a') && (ebr.part_next > 0))
     {
         float porcentaje = ((float)((ebr.part_size) / (float)(extendida.part_size))) * 100;
-        salida2 += "ebr"+to_string(c_disk)+"[shape=record label=\"EBR\"];\n";
-        salida2 += "l" + to_string(c_disk) + "[ shape=record label=<<table border=\"0\"><tr><td>"+convertToString(ebr.part_name, 16)+"</td></tr><tr><td>" + to_string(porcentaje) + "% del disco</td></tr></table>>];\n";
-        if((ebr.part_next- (ebr.part_start + ebr.part_size + sizeof(ebr) +1))>0){
-            c_disk+=1;
-             float porcentaje = ((float)((ebr.part_next) - (ebr.part_start + ebr.part_size+ sizeof(ebr) + 1)) / (float)(extendida.part_size)) * 100;
+        salida2 += "ebr" + to_string(c_disk) + "[shape=record label=\"EBR\"];\n";
+        salida2 += "l" + to_string(c_disk) + "[ shape=record label=<<table border=\"0\"><tr><td>" + convertToString(ebr.part_name, 16) + "</td></tr><tr><td>" + to_string(porcentaje) + "% del disco</td></tr></table>>];\n";
+        if ((ebr.part_next - (ebr.part_start + ebr.part_size + sizeof(ebr) + 1)) > 0)
+        {
+            c_disk += 1;
+            float porcentaje = ((float)((ebr.part_next) - (ebr.part_start + ebr.part_size + sizeof(ebr) + 1)) / (float)(extendida.part_size)) * 100;
             salida2 += "l" + to_string(c_disk) + "[ shape=record label=<<table border=\"0\"><tr><td>Libre</td></tr><tr><td>" + to_string(porcentaje) + "% del disco</td></tr></table>>];\n";
         }
         generarExtend(ebr.part_next, porcentaje, disco, extendida);
     }
+    cout<<salida2<<endl;
     return salida2;
 }
 //Funcion que grafica el disco
 string graficarDisco(mbr master, FILE *disco)
 {
     string salida = "";
-    salida2;
+    string salida2 ="";
     c_disk = 0;
     if (master.mbr_partition_1.part_status == 'n')
     {
@@ -1077,13 +1080,15 @@ void block(report reporte)
 string generarTI(inode temporal, int num)
 {
     string aux;
-    if (temporal.i_type=='0')
+    if (temporal.i_type == '0')
     {
         aux = "Carpeta";
-    }else{
+    }
+    else
+    {
         aux = "Archivo";
     }
-    string salida = "<tr><td border=\"1\">"+to_string(num)+"</td><td border=\"1\">"+aux+"</td><td border=\"1\"> "+temporal.nombre+"</td></tr>\n";
+    string salida = "<tr><td border=\"1\">" + to_string(num) + "</td><td border=\"1\">" + aux + "</td><td border=\"1\"> " + temporal.nombre + "</td></tr>\n";
     return salida;
 }
 bool in(report reporte)
@@ -1099,6 +1104,22 @@ bool in(report reporte)
             fread(&master, sizeof(mbr), 1, disco);
             partition particion = obtenerParticion(master, obtenerN(reporte.id));
             superblock sb;
+            if (particion.part_status == 'n')
+            {
+                partition particion2 = obtenerParticionExtendida(master);
+                ebr aux = obtenerLogica(obtenerN(reporte.id), particion2.part_start + sizeof(partition) + 1, disco);
+                if (aux.part_status == 'a')
+                {
+                    particion.part_status = aux.part_status;
+                    particion.part_fit = aux.part_fit;
+                    particion.part_start = aux.part_start + sizeof(ebr) + 1;
+                    particion.part_size = aux.part_size;
+                }
+                else
+                {
+                    cout << "Error, no se encontro ninguna particion" << endl;
+                }
+            }
             fseek(disco, particion.part_start, SEEK_SET);
             fread(&sb, sizeof(superblock), 1, disco);
             char bm[sb.s_inodes_count];
@@ -1168,6 +1189,16 @@ void rep(vector<string> partes)
         }
         else if (lower(componentes[0]) == "-path")
         {
+            vector<string> partes_direccion = split(quitarComillas(componentes[1]), "/");
+            string aux = "";
+            for (int i = 0; i < partes_direccion.size(); i++)
+            {
+                if ((i + 1) < partes_direccion.size())
+                {
+                    aux += "/" + partes_direccion[i];
+                }
+            }
+            mkdir(aux.c_str(), 0777);
             reporte.path = quitarComillas(componentes[1]);
         }
         else if (lower(componentes[0]) == "-id")
@@ -1191,8 +1222,9 @@ void rep(vector<string> partes)
     {
         cout << "Parametros obligatorios incompletos" << endl;
     }
-    else if(((lower(reporte.name)=="file")||(lower(reporte.name)=="ls"))&&(reporte.ruta=="")){
-        cout<<"Ruta del archivo o carpeta no especificada"<<endl;
+    else if (((lower(reporte.name) == "file") || (lower(reporte.name) == "ls")) && (reporte.ruta == ""))
+    {
+        cout << "Ruta del archivo o carpeta no especificada" << endl;
     }
     else
     {
@@ -1223,7 +1255,7 @@ void rep(vector<string> partes)
     }
 }
 /*
-mount -path=/home/user/Disco1.dk -name=Particion1
+mount -path=/home/user/Disco1.dk -name=Particion2
 rep -id=291A -Path=/home/user/reportes/reporteMBR.jpg -name=mbR
 rep -id=291A -Path=/home/user/reportes/reporteDisco.jpg -name=DISK
 rep -id=291A -Path=/home/user/reportes/reporteInodo.jpg -name=Inode

@@ -112,8 +112,14 @@ struct dirBlock{
 struct fileBlock{
     char b_content[64];
 };
-struct ptrBlock{
-    int b_pointers[16];
+struct JOURNAL{
+    char tipo_operacion[10];
+    char tipo;
+    char nombre[200];
+    char contenido[200];
+    char fecha[16];
+    char propietario[10];
+    int permisos;
 };
  
 
@@ -237,6 +243,29 @@ string lower(string cadena ){
     }
     return array;
 }
+//Funcion split_bloque... separa las cadenas segun un separador
+ vector<string> split_bloque(string cadena){
+    vector<string> array;
+    string temporal = "";
+    for(int i=0;i<cadena.length();i++){
+        int ascii = cadena[i];
+        if(((i+1) % 64) == 0 ){
+
+            temporal += cadena[i];
+            
+            array.push_back(temporal);
+                        temporal ="";
+        }else if((i+1) == cadena.length()){
+            temporal += cadena[i];
+            array.push_back(temporal);
+            temporal ="";
+            break;
+        }else{
+            temporal += cadena[i];
+        }
+    }
+    return array;
+}
 //Comprobar direccion dentro de la computadora
 void comprobarDireccion(string direccion){
     vector<string> lista = split(direccion,"/");
@@ -250,7 +279,6 @@ void comprobarDireccion(string direccion){
         }
     }
 }
-
 string quitarComillas(string cadena){
     string salida= "";
     for(int i=0;i<cadena.length();i++){

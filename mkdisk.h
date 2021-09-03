@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <string.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -36,7 +37,15 @@ void crearDisco(disk disco, int id){
         fclose(archivo);
         cout<<"Disco creado exitosamente"<<endl;
     }else{
-        cout<<"Error al crear el disco"<<endl;
+        vector<string> partes_direccion = split(disco.direccion, "/");
+        string aux = "";
+        for (int i= 0; i < partes_direccion.size();i++){
+            if((i+1)<partes_direccion.size()){
+                aux+= "/" +partes_direccion[i];
+            }
+        }
+        mkdir(aux.c_str(),0777);
+        crearDisco(disco,id);
     }
 }
 void mkdisk(vector<string>Argumentos, int id){

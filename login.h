@@ -19,18 +19,46 @@ bool logear(l_user user)
                 fread(&master, sizeof(master), 1, disco);
                 partition particion = obtenerParticion(master, obtenerN(user.id));
                 superblock sb;
+                if (particion.part_status == 'n')
+                {
+                    partition particion2 = obtenerParticionExtendida(master);
+                    ebr aux = obtenerLogica(obtenerN(user.id), particion2.part_start + sizeof(partition) + 1, disco);
+                    if (aux.part_status == 'a')
+                    {
+                        particion.part_status = aux.part_status;
+                        particion.part_fit = aux.part_fit;
+                        particion.part_start = aux.part_start + sizeof(ebr) + 1;
+                        particion.part_size = aux.part_size;
+                    }
+                    else
+                    {
+                        cout << "Error, no se encontro ninguna particion" << endl;
+                    }
+                }
                 fseek(disco, particion.part_start, SEEK_SET);
                 fread(&sb, sizeof(sb), 1, disco);
+                inode in;
+                fseek(disco, sb.s_inode_start + sizeof(inode), SEEK_SET);
+                fread(&in, sizeof(in), 1, disco);
+                string aux2 = "";
                 dirBlock b1;
                 fileBlock b2;
-                fseek(disco, sb.s_block_start + sizeof(b1), SEEK_SET);
-                fread(&b2, sizeof(b2), 1, disco);
-                vector<string> usuarios = split(b2.b_content, "\n");
+                for (int i = 0; i < 15; i++)
+                {
+                    if (in.i_block[i] >= 0)
+                    {
+                        fseek(disco, sb.s_block_start + (in.i_block[i]*sizeof(b1)), SEEK_SET);
+                        fread(&b2, sizeof(b2), 1, disco);
+                        aux2+= b2.b_content;
+                    }
+                }
+                vector<string> usuarios = split(aux2, "\n");
                 bool ingreso = false;
                 for (int i = 0; i < usuarios.size(); i++)
                 {
                     vector<string> partes = split(usuarios[i], ",");
-                    if ((partes[1] == "u") || (partes[1] == "U"))
+                    if( partes.size() >2){
+                        if ((partes[1] == "u") || (partes[1] == "U"))
                     {
                         if (partes[3] == user.user)
                         {
@@ -40,6 +68,7 @@ bool logear(l_user user)
                                 id = user.id;
                                 ingreso = true;
                                 cout << "Login completado, BIENVENIDO" << endl;
+                                break;
                             }
                             else
                             {
@@ -47,7 +76,8 @@ bool logear(l_user user)
                             }
                         }
                     }
-                
+                    }
+                    
                 }
                 if (ingreso == false)
                 {
@@ -115,6 +145,6 @@ void login(vector<string> partes)
     }
 }
 /*
-login -usr=root -pwd=123 -id=291A
+login -usr=root -pwd=123 -id=291a
 login -usr=rot -pwd=123 -id=291A
 */

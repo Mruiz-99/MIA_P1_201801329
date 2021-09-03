@@ -82,7 +82,7 @@ void mount (vector<string> partes){
             part.path = quitarComillas(componenetes[1]);
         }else if (lower(componenetes[0])=="-name")
         {
-            part.name = quitarComillas(componenetes[1]);
+            part.name = quitarComillas(lower(componenetes[1]));
         }else{
             cout<<"Comando '"<<componenetes[0]<<"' no valido"<<endl;
             problem = true;
@@ -97,10 +97,12 @@ void mount (vector<string> partes){
     
 }
 /*
-mount -path=/home/user/Disco1.dk -name=Particion1
+mount -path=/home/user/Disco1.dk -name=Particion2
+login -usr=user4 -pwd=usuario -id=291a
 umount -id=291a
-mkfs -type=full -id=291A
-mkgrp -name=USUARIOs
-rmgrp -name=USUARIO
-mkusr -usr=user1 -pwd=usuario -grp=root
+mkfs -type=full -id=291b
+mkfs -type=full -id=291a -fs=3fs
+mkgrp -name=USUARIO2
+rmgrp -name=USUARIO6
+mkusr -usr=user5 -pwd=usuario -grp=root
 */
