@@ -122,6 +122,16 @@ struct JOURNAL{
     int permisos;
 };
  
+ struct chmod_perm{
+    string direccion;
+    int ugo;
+    bool recursivo;
+};
+
+ struct part_mkdir{
+    string direccion;
+    bool recursivo;
+};
 
 #include <iostream>
 #include <vector>

@@ -20,6 +20,8 @@ int fsys = 0;
 //Usuario activo
 string usuario = "";
 string id = "";
+int uid = 0;
+string grupo ="";
 
 #include "exec.h"
 #include "mkdisk.h"
@@ -35,6 +37,8 @@ string id = "";
 #include "rmgrp.h"
 #include "mkusr.h"
 #include "rmusr.h"
+#include "chmod.h"
+#include "mkdir.h"
 
 void ejecutar(string cmd)
 {
@@ -93,6 +97,14 @@ void ejecutar(string cmd)
         else if (lower(partes[0]) == "rmusr")
         {
             rmusr(partes);
+        }
+        else if (lower(partes[0]) == "chmod")
+        {
+            chmod(partes);
+        }
+        else if (lower(partes[0]) == "mkdir")
+        {
+            mkdir(partes);
         }
         else if (lower(partes[0]) == "pause")
         {

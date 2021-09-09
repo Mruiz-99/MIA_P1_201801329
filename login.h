@@ -66,6 +66,8 @@ bool logear(l_user user)
                             {
                                 usuario = user.user;
                                 id = user.id;
+                                uid= atoi(partes[0].c_str());
+                                grupo = partes[2];
                                 ingreso = true;
                                 cout << "Login completado, BIENVENIDO" << endl;
                                 break;

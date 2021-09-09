@@ -11,6 +11,8 @@ bool cerrarSesion()
     {
         usuario = "";
         id="";
+        uid=0;
+        grupo="";
         cout << "Sesion Cerrada..." << endl;
         cout << "Hasta pronto..." << endl;
     }

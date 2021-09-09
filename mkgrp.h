@@ -5,6 +5,71 @@
 
 using namespace std;
 
+int obtenerGID(string nombre){
+    FILE *disco;
+        if (disco = fopen(obtenerDireccion(id).c_str(), "rb+"))
+        {
+            mbr master;
+            fseek(disco, 0, SEEK_SET);
+            fread(&master, sizeof(master), 1, disco);
+            partition particion = obtenerParticion(master, obtenerN(id));
+            superblock sb;
+            if (particion.part_status == 'n')
+            {
+                partition particion2 = obtenerParticionExtendida(master);
+                ebr aux = obtenerLogica(obtenerN(id), particion2.part_start + sizeof(partition) + 1, disco);
+                if (aux.part_status == 'a')
+                {
+                    particion.part_status = aux.part_status;
+                    particion.part_fit = aux.part_fit;
+                    particion.part_start = aux.part_start + sizeof(ebr) + 1;
+                    ;
+                    particion.part_size = aux.part_size;
+                }
+                else
+                {
+                    cout << "Error, no se encontro ninguna particion" << endl;
+                }
+            }
+            fseek(disco, particion.part_start, SEEK_SET);
+            fread(&sb, sizeof(sb), 1, disco);
+            inode in;
+            fseek(disco, sb.s_inode_start + sizeof(inode), SEEK_SET);
+            fread(&in, sizeof(in), 1, disco);
+            string aux2 = "";
+            dirBlock b1;
+            fileBlock b2;
+            for (int i = 0; i < 15; i++)
+            {
+                if (in.i_block[i] >= 0)
+                {
+                    fseek(disco, sb.s_block_start + (in.i_block[i] * sizeof(b1)), SEEK_SET);
+                    fread(&b2, sizeof(b2), 1, disco);
+                    aux2 += b2.b_content;
+                }
+            }
+            vector<string> usuarios = split(aux2, "\n");
+            for (int i = 0; i < usuarios.size(); i++)
+            {
+                vector<string> partes = split(usuarios[i], ",");
+                if ((partes[1] == "g") || (partes[1] == "G"))
+                {
+                    if (partes[2] == nombre)
+                    {
+                        return atoi(partes[0].c_str());
+                    }
+                }
+            }
+            fclose(disco);
+        }
+        else
+        {
+            cout << "El archivo de disco no existe" << endl;
+        }
+        fclose(disco);
+        return 0;
+}
+
 //Funcion que monta una particion a memoria
 bool mkgroup(string nombre)
 {
@@ -100,7 +165,6 @@ bool mkgroup(string nombre)
                             {
                                 fseek(disco, i, SEEK_SET);
                                 fread(&res, sizeof(char), 1, disco);
-                                cout<<i<<endl;
                                 if (res == '0')
                                 {
                                     num = bloque;

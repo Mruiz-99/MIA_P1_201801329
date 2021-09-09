@@ -98,11 +98,11 @@ void mount (vector<string> partes){
 }
 /*
 mount -path=/home/user/Disco1.dk -name=Particion2
-login -usr=user4 -pwd=usuario -id=291a
+login -usr=root -pwd=123 -id=291a
 umount -id=291a
 mkfs -type=full -id=291b
 mkfs -type=full -id=291a -fs=3fs
 mkgrp -name=USUARIO2
 rmgrp -name=USUARIO6
-mkusr -usr=user5 -pwd=usuario -grp=root
+mkusr -usr=user4 -pwd=usuario -grp=root
 */

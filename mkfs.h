@@ -85,13 +85,13 @@ void ext2(fs sistema)
                     fwrite(&bloque, sizeof(bloque), 1, disco);
                 }
             }
-            inode root = {0, 0, sizeof(fileBlock), time(0), time(0), time(0), {0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '0', 0, '/'};
-            content c1 = {".", 0};
-            content c2 = {"..", -1};
-            content c3 = {"user.txt", 1};
-            content c4;
+            inode root = {1, 1, sizeof(fileBlock), time(0), time(0), time(0), {0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '0', 664, '/'};
+            content c1 = {"user.txt", 1};
+            content c2 = {"",0};
+            content c3= {"",0};
+            content c4= {"",0};
             dirBlock b1 = {{c1, c2, c3, c4}};
-            inode usr = {0, 0, sizeof(fileBlock), time(0), time(0), time(0), {1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '1', 0, "/user.txt"};
+            inode usr = {1, 1, sizeof(fileBlock), time(0), time(0), time(0), {1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '1', 664, "/user.txt"};
             fileBlock b2 = {"1,G,root\n1,U,root,root,123"};
             fseek(disco, sb.s_inode_start, SEEK_SET);
             fwrite(&root, sizeof(root), 1, disco);
@@ -242,13 +242,13 @@ void ext3(fs sistema)
                     fwrite(&bloque, sizeof(bloque), 1, disco);
                 }
             }
-            inode root = {0, 0, sizeof(fileBlock), time(0), time(0), time(0), {0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '0', 0, '/'};
-            content c1 = {".", 0};
-            content c2 = {"..", -1};
-            content c3 = {"user.txt", 1};
-            content c4;
+            inode root = {1, 1, sizeof(fileBlock), time(0), time(0), time(0), {0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '0', 664, '/'};
+            content c1 = {"user.txt", 1};
+            content c2 = {"",0};
+            content c3 = {"",0};
+            content c4= {"",0};
             dirBlock b1 = {{c1, c2, c3, c4}};
-            inode usr = {0, 0, sizeof(fileBlock), time(0), time(0), time(0), {1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '1', 0, "/user.txt"};
+            inode usr = {1, 1, sizeof(fileBlock), time(0), time(0), time(0), {1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, '1', 664, "/user.txt"};
             fileBlock b2 = {"1,G,root\n1,U,root,root,123"};
             fseek(disco, sb.s_inode_start, SEEK_SET);
             fwrite(&root, sizeof(root), 1, disco);
